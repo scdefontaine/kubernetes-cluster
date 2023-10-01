@@ -1,0 +1,12 @@
+
+stages:
+  - deploy-gke-cluster
+
+deploy-gke-cluster:
+  stage: deploy-gke-cluster
+  when: manual
+  trigger:
+    include:
+      - local: google-cloud/.gitlab-ci.yml
+    strategy: depend
+
