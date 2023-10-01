@@ -1,0 +1,68 @@
+# # base image
+# image: redhat/ubi8
+
+# # setup & variables
+# .variables: &variables
+#   SERVICE_ACCOUNT_KEY: $SERVICE_ACCOUNT_KEY
+
+# .shared_settings: &shared_settings
+#   image: hashicorp/terraform:light
+#   allow_failure: false
+#   only:
+#     - main
+#   variables:
+#     <<: *variables
+#   before_script:
+#     - rm -rf .terraform
+#     - terraform --version
+#     - mkdir -p ./creds
+#     - echo $SERVICE_ACCOUNT_KEY | base64 -d > ./creds/serviceaccount.json
+#     - terraform init -input=false
+
+# # Run stages
+
+# stages:
+#   - validate
+#   - plan
+#   - apply
+#   - teardown
+
+# validate:
+#   <<: *shared_settings
+#   stage: validate
+#   script:
+#     - terraform validate
+
+# plan:
+#   <<: *shared_settings
+#   stage: plan
+#   dependencies:
+#     - validate
+#   script:
+#     - terraform plan -out "planfile"
+#   artifacts:
+#     paths:
+#       - planfile
+#     expire_in: "2 days"
+
+# apply:
+#   <<: *shared_settings
+#   stage: apply
+#   dependencies:
+#     - plan
+#   environment:
+#     name: production
+#     on_stop: teardown
+#   script:
+#     - terraform apply -input=false -auto-approve
+
+# teardown:
+#   <<: *shared_settings
+#   dependencies:
+#     - apply
+#   environment:
+#     name: production
+#     action: stop
+#   script:
+#     - terraform destroy -input=false -auto-approve
+

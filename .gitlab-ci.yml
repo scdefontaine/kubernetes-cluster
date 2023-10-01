@@ -1,6 +1,6 @@
 
 stages:
-  - deploy-gke-cluster
+  - deploy-eks-cluster
 
 deploy-gke-cluster:
   stage: deploy-gke-cluster
@@ -8,5 +8,13 @@ deploy-gke-cluster:
   trigger:
     include:
       - local: google-cloud/.gitlab-ci.yml
+    strategy: depend
+
+deploy-eks-cluster:
+  stage: deploy-eks-cluster
+  when: manual
+  trigger:
+    include:
+      - local: aws/.gitlab-ci.yml
     strategy: depend
 
